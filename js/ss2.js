@@ -1,5 +1,7 @@
-$(document).ready(function(){
-	var play, status, rotate1, rotate2, rotate3, rotate4, rotate5, one = drag = flag = permit = direction = false, arg = [0,0], condi = [1,1], num = pageNum = rota = opac =  0;
+﻿$(document).ready(function(){
+	var play, status, rotate1, rotate2, rotate3, rotate4, rotate5, clickX, actorX, turn1, turn2;
+	var one = drag = flag = permit = direction = false, num = pageNum = rota = opac = y = 0, x = 180, arg = [0,0], condi = [1,1];
+	var a = $('input:eq(0)'), b = $('input:eq(1)'), c = $('input:eq(2)'), d = $('textarea'), limit1 = $('.book').position().left;
 //	文字动画
 	$('h5').animate({opacity:0},10000);
 	$('.walk:eq(0)').animate({left:-$('.walk').width()+'px'},10000,'linear',function(){
@@ -41,8 +43,7 @@ $(document).ready(function(){
 		$('html').animate({scrollTop:$('#about').offset().top},1000);
 	});
 	$('.top').click(function(){
-		var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
-		if(scrollTop < $('#home').offset().top - 1) return false;
+		if($(window).scrollTop < $('#home').offset().top - 1) return false;
 		$('html').animate({scrollTop:0},500);
 	});
 	//回到顶部缩放定位
@@ -155,7 +156,6 @@ $(document).ready(function(){
 		});
 	}
 //	拖拽动画
-	var clickX, actorX, limit1 = $('.book').position().left;
 	$('.book').mousedown(function(e){
 		drag = true;
 		$('.book').css('cursor','move');
@@ -175,14 +175,13 @@ $(document).ready(function(){
 		$('.book').css('cursor','pointer');
 	});
 //	翻页动画
-	var turn1, turn2, x=180 ,y=0;
 	$('.book div:eq(1), .book li:eq(1)').mouseover(function(){
 		clearInterval(turn1);
 		clearInterval(turn2);
 		turn1 = setInterval(function(){
-			if(x>0){
-				x-=2,y-=2;
-				x<0 && (x=0, y=-180, clearInterval(turn1));
+			if(x > 0){
+				x -= 2, y -= 2;
+				x < 0 && (x = 0, y = -180, clearInterval(turn1));
 				$('.book li:eq(0)').css('transform','rotateY(' + x + 'deg)');
 				$('.book li:eq(1)').css('transform','rotateY(' + y + 'deg)');
 			}
@@ -192,9 +191,9 @@ $(document).ready(function(){
 		clearInterval(turn1);
 		clearInterval(turn2);
 		turn2 = setInterval(function(){
-			if(x<180){
-				x+=2,y+=2;
-				x>180 && (x=180, y=0, clearInterval(turn2));
+			if(x < 180){
+				x += 2,y += 2;
+				x > 180 && (x = 180, y = 0, clearInterval(turn2));
 				$('.book li:eq(0)').css('transform','rotateY(' + x + 'deg)')
 				$('.book li:eq(1)').css('transform','rotateY(' + y + 'deg)')
 			}
@@ -224,21 +223,20 @@ $(document).ready(function(){
 			!arg[index] && clearInterval(eval('rotate' + (index + 4)));
 		}
 	});
-//	info动画
+//	faqs动画
 	$('.old').each(function(index){
 		$(this).click(function(){
-			var x = $('.new:eq(' + index + ')');
-			if(x.css('display') == 'block'){
+			var choice = $('.new:eq(' + index + ')');
+			if(choice.css('display') == 'block'){
 				$(this).find('span').html('+');
-				x.slideUp(300);
+				choice.slideUp(300);
 			}else{
 				$(this).find('span').html('-');
-				x.slideDown(300);
+				choice.slideDown(300);
 			}
 		});
 	});
-	//表单判断
-	var a = $('input:eq(0)'), b = $('input:eq(1)'), c = $('input:eq(2)'), d = $('textarea');
+//	表单判断
 	a.keyup(function(){
 		name();
 	})
@@ -312,14 +310,14 @@ $(document).ready(function(){
    		return reg.test(str);
 	}
 //	滚轮动画
-	window.onscroll = function(){
+	$(window).scroll(function(){
 		//导航栏及回到顶部位置变化
 		var high = $(window).height();
-		var scrollTop = $(document).scrollTop()
+		var scrollTop = $(window).scrollTop();
 		var bottom = high - $('.top').height();
 		var right = ($(window).width() - $('#container').width()) / 2;
 		if(scrollTop >= $('#home').offset().top - 1){
-			$('.nav').css({position:'fixed',top:0,cursor:'pointer'});
+			$('.nav').css({position:'fixed',top:0});
 			$('.top').css({top: bottom - 10 +'px',right: right + 10 +'px',cursor:'pointer'});
 		}else{
 			$('.nav').css({position:'',top:''});
@@ -342,12 +340,13 @@ $(document).ready(function(){
 				$('.nav p').removeClass('active');
 			}
 		});
-		//各部分动画
+		//标题呈现
 		$('.title').each(function(index){
 			if(scrollTop >=  $('.note:eq('+ index +')').offset().top + 20 - high){
 				$('.title:eq('+ index +'),.note:eq('+ index +')').css('animation','show 2s 0.5s');
 			}
 		});
+		//图片移动
 		if(scrollTop >= $('.gallery').offset().top - high){
 			$('.gallery li:eq(0)').css('animation','group1 1s');
 			$('.gallery li:eq(1)').css('animation','group2 1.07s');
@@ -360,18 +359,21 @@ $(document).ready(function(){
 			$('.gallery li:eq(6)').css('animation','group3 1.54s');
 			$('.gallery li:eq(7)').css('animation','group4 2s');
 		}
+		//书本打开
+		if(scrollTop >=  $('.book').offset().top - high){
+			$('.book div:eq(0)').css('animation','open 3s both');
+		}
+		//demo摇晃
 		if(scrollTop >=  $('.ss:eq(0)').offset().top - high){
 			$('.ss:eq(0)').css('animation','shake 3s');
 		}
 		if(scrollTop >=  $('.fcc').offset().top - high){
 			$('.fcc').css('animation','shake 3s');
 		}
-		if(scrollTop >=  $('.book').offset().top - high){
-			$('.book div:eq(0)').css('animation','open 3s both');
-		}
+		//faqs展开
 		if(scrollTop >=  $('.old:eq(0)').offset().top + $('.old').height()- high){
 			!one && ($('.old span').html('-'),$('.new').slideDown(3000));
 			one = true;
 		}
-	}
+	});
 });
